@@ -1,0 +1,40 @@
+name: bwinf41valentin_ahrend
+description: Programm für den 41. BWINF von Valentin Ahrend
+publish_to: 'none'
+version: 1.0.0+1 #version0
+environment:
+  sdk: '>=2.18.0-141.0.dev <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2 # Für Standard-Icons (macOS,iOS)
+  url_launcher: ^6.1.6 # Für das Launchen von URLs (Öffnen des Browsers)
+  image: ^3.2.0 # Für das Bearbeiten von Pixeln in Bildern, PixelArt. (für Aufgabe 2)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/other/portrait.png
+    - assets/aufgabe_1_stoerung/stoerung0.txt
+    - assets/aufgabe_1_stoerung/stoerung1.txt
+    - assets/aufgabe_1_stoerung/stoerung2.txt
+    - assets/aufgabe_1_stoerung/stoerung3.txt
+    - assets/aufgabe_1_stoerung/stoerung4.txt
+    - assets/aufgabe_1_stoerung/stoerung5.txt
+    - assets/aufgabe_1_stoerung/Alice_im_Wunderland.txt
+    - assets/aufgabe_5_huepfburg/huepfburg0.txt
+    - assets/aufgabe_5_huepfburg/huepfburg1.txt
+    - assets/aufgabe_5_huepfburg/huepfburg2.txt
+    - assets/aufgabe_5_huepfburg/huepfburg3.txt
+    - assets/aufgabe_5_huepfburg/huepfburg4.txt

@@ -1,0 +1,264 @@
+/// Um festzustellen, ob das Spiel möglich ist, wird versucht die finale Kette an Punkten zu bilden.
+    /// Das Spiel ist möglich, wenn die Ketten am gleichen Index den selben Wert (Punkt) aufweisen.
+    /// 
+    /// Zunächst werden für beide Spieler alle Ketten ohne Rekursionen gebildet.
+    /// Ohne Rekursionen heißt: Sobald die Kette 2mal den gleichen Wert aufweist, ist sie beendet.
+    /// 
+    /// Nach jeder neuen Kette wird beim letzte Punkt, welcher mehrfacheVerbindungen() aufwies, die genutzte Verbindung gelöscht.
+    /// Sodass die nächste Kette nicht der letzten entspricht.
+    /// Es wird direkt die erstmögliche Verbindung genutzt.
+    /// 
+    /// Zuerst werden die Ketten von Spieler 1 ermittelt, dann von Spieler 2. Anschließend folgt die Kontrolle...
+    
+    /// spieler1 = Mika
+    List<String> kettenVonMika = [];
+    
+    /// neue Idee: Es werden Verbindung nur für bestimmte Punkte blockiert.
+
+    while(true) {
+      break;
+      List<int> kette = ketteErstellen(allePunkte, [startPositionMika]);
+      /// die Kette wird von hinten nach vorne durchsucht.
+      /// Dem lezten Punkt, der mehere Verbindungen hatte wird die genutzte Verbindung nun entzogen.
+      if(kette.length > 1){ 
+        allePunkte[kette.last - 1].verbindungBlockieren(kette.getRange(0, kette.length -1).join(","));
+        /// Hinweis: mit huepfburg1.txt ist mir aufgefallen, dass die Ketten sich in ihrer Grundform
+        /// wiederholen:
+        /// Bsp:
+        /// Kette1: 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+        /// Kette2: 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+        /// Kette3: 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+        /// 
+        /// Kette2 und Kette3 dürfen allerdings gelöscht werden, da sie Kette1 in ihren Werten entsprechen.
+        /// Da keine Rekursion der Zahlen innerhalb der Kette hier möglich ist, spielt es auch keine Rolle, ob sich die Kette 
+        /// wiederholt (dann wäre schließlich die Länge der Kette wichtig).
+      
+        /// Wenn die Punkte nur eine weitere Verbindung aufweisen wird der Punkt auch geblockt.
+        for (var i = kette.length - 2; i >=0; i--) {
+          Punkt vorherigerPunkt = allePunkte[kette[i] - 1];
+          if(vorherigerPunkt.verbindungen.length == 1){
+            allePunkte[kette[i] - 1].verbindungBlockieren(kette.getRange(0, i).join(","));
+          }
+        }
+      }
+  
+      String ketteString = kette.join(",");
+      print(ketteString);
+      
+      if(kettenVonMika.contains(ketteString)) {
+        break;
+      }
+      kettenVonMika.add(ketteString);
+    }
+    List<String> kettenVonSasha = [];
+
+    /// die allePunkte Liste wird auf ihren Anfangswert zurückgesetzt.
+    allePunkte.forEach((element){element.reset();});
+    print(allePunkte);
+    while(true) {
+      break;
+      List<int> kette = ketteErstellen(allePunkte, [startPositionSasha]);
+
+      if(kette.length > 1){ 
+        allePunkte[kette.last - 1].verbindungBlockieren(kette.getRange(0, kette.length -1).join(","));
+        for (var i = kette.length - 2; i >=0; i--) {
+          Punkt vorherigerPunkt = allePunkte[kette[i] - 1];
+          if(vorherigerPunkt.verbindungen.length == 1){
+            allePunkte[kette[i] - 1].verbindungBlockieren(kette.getRange(0, i).join(","));
+          }
+        }
+      }
+  
+      /// kette wird zur besseren Übersicht in einen String umgewandelt.
+      String ketteString = kette.join(",");
+      print(ketteString);
+
+      
+      if(kettenVonSasha.contains(ketteString)) {
+        break;
+      }
+      kettenVonSasha.add(ketteString);
+    }
+  
+    List<String> kontrollWert = kontrolle(kettenVonMika, kettenVonSasha);
+
+    class Punkt {
+
+  static Punkt leererPunkt() {
+    return Punkt(-1, {});
+  }
+
+  final int id;
+  Set<int> verbindungen;
+  Set<String> blockiertePunkte = {};
+  String original;
+
+  /// Teil 2
+  Set<Runner> aktuelleRunner = {};
+
+  Punkt(this.id, this.verbindungen) : original = verbindungen.join(",");
+
+  /// Hier wird ausgegeben, ob das Feld meherer Verbindungen hat oder nur eine.
+  bool mehrfacheVerbindung() {
+    return verbindungen.length > 1;
+  }
+
+  /// Hier wird ausgegeben, ob das Feld das Ende einer Kette sein kann bzw. keine weiteren Verbindungen hat.
+  bool ende() {
+    return verbindungen.isEmpty;
+  }
+
+  bool blockiert(String verbindungsPunkt) {
+    if(blockiertePunkte.contains("-1")){
+      return true;
+    }
+    return blockiertePunkte.contains(verbindungsPunkt);
+  }
+
+  /// fügt Verbindungen hinzu.
+  void verbindungAddieren(int neueVerbindung) {
+    verbindungen.add(neueVerbindung);
+    original = verbindungen.join(",");
+  }
+
+  /// Die Verbindung kann, falls sie schon verwendet wurde (z.B.), gelöscht werden, damit sie nicht erneut verwendet wird.
+  void verbindungBlockieren(String verbindungsKette){
+    blockiertePunkte.add(verbindungsKette);
+  }
+
+  /// Alle Verbindungen entfernen
+  void verbindungAlleBlockieren() {
+    blockiertePunkte.add("-1");
+  }
+
+  /// Die Verbindungen werden zurückgesetzt
+  void reset() {
+    /*if(original.isNotEmpty){
+      verbindungen = original.split(",").map((e) => int.parse(e)).toSet();
+    }else{
+      verbindungen = {};
+    }*/
+    blockiertePunkte = {};
+  }
+
+  /// gibt an, ob es sich um einen Dummy Punkt handelt.
+  bool leer() {
+    return id == -1;
+  }
+
+  /// Hier wird getestet, ob sich in dem Set<Runner> aktuelleRunner, Runner mit unterschiedlichem Typ befinden.
+  /// Wenn ja, ist das Spiel erfolgreich.
+  List<Runner> test() {
+    int runnerTyp = -1;
+    Runner? letzterRunner;
+    for (Runner runner in aktuelleRunner) {
+      if(runnerTyp == -1){
+        runnerTyp = runner.typ;
+        letzterRunner = runner;
+      }else{
+        if(runnerTyp != runner.typ){
+          /// found!
+          return [runner, letzterRunner!];
+        }else{
+          letzterRunner = runner;
+        }
+      }
+    }
+    return [];
+  }
+
+  void runnerAddieren(Runner runner){
+    aktuelleRunner.add(runner);
+  }
+
+  Set<Runner> runnerAbmelden() {
+
+    if(aktuelleRunner.isEmpty){
+      return {};
+    }
+
+    if(aktuelleRunner.length < verbindungen.length) {
+
+      /// ermittle den Runner mit der kleinsten zurückgelegten Strecke
+      List<Runner> runnerList = aktuelleRunner.toList();
+      runnerList.sort((runner1, runner2) => runner1.gelaufeneFelder.length.compareTo(runner2.gelaufeneFelder.length));
+
+      int neueRunnerAnzahl = verbindungen.length - aktuelleRunner.length;
+      for (var i = 0; i < neueRunnerAnzahl; i++) {
+        aktuelleRunner.add(Runner.from(runnerList.first));
+      }
+    }else{
+      if(verbindungen.length < aktuelleRunner.length) {
+        int removeRunnerAnzahl = aktuelleRunner.length - verbindungen.length;
+        aktuelleRunner.removeAll(aktuelleRunner.toList().getRange(0, removeRunnerAnzahl));
+      }
+    }
+
+    Set<Runner> ausgabeRunners = {};
+
+    /// verbindungen werden den Runnern zugeordnet
+    int i = 0;
+    for (Runner runner in aktuelleRunner) {
+      int verbindung = verbindungen.elementAt(i);
+      runner.gelaufeneFelder.add(runner.naechsterPunkt);
+      runner.naechsterPunkt = verbindung;
+      ausgabeRunners.add(Runner(runner.typ, runner.gelaufeneFelder, runner.naechsterPunkt));
+      i++;
+    }
+    
+    aktuelleRunner.clear();
+
+    return ausgabeRunners;
+
+  }
+
+  @override
+  String toString() {
+    return "Punkt: $id, $verbindungen, $blockiertePunkte";
+  }
+}
+
+
+
+List<int> ketteErstellen(List<Punkt> allePunkte1, List<int> aktuelleKette) {
+    /// der aktuelle Punkt ist der letzte Punkt der Kette. Der Index + 1 jedes Punktes in allePunkte entspricht seiner id.
+    Punkt aktuellerPunkt = allePunkte1[aktuelleKette.last - 1];
+    for (int verbindung in aktuellerPunkt.verbindungen) {
+      if(!aktuelleKette.contains(verbindung) && !allePunkte1[verbindung - 1].blockiert(aktuelleKette.join(","))) { /// (keine Rekursion)
+        aktuelleKette.add(verbindung);
+        return ketteErstellen(allePunkte1, aktuelleKette);
+      }
+    }
+    return aktuelleKette;
+  }
+
+
+  List<String> kontrolle(List<String> kettenA, List<String> kettenB) {
+    /// es wird überprüft, ob es ein Paar an Ketten gibt, dass am selben Index einen gleichen Wert hat.
+    /// dieses Kettenpaar wird am Ende ausgegeben.
+    /// Wenn keins gefunden wurde, so wird eine leere Liste ausgegeben.
+    
+    for (String ketteA in kettenA) {
+      for (String ketteB in kettenB) {
+        List<int> ketteAList = ketteA.split(",").map((e) => int.parse(e)).toList();
+        List<int> ketteBList = ketteB.split(",").map((e) => int.parse(e)).toList();
+        if(ketteAList.length > ketteBList.length){
+          for (var i0 = 0; i0 < ketteBList.length; i0++) {
+            if(ketteBList[i0] == ketteAList[i0]) {
+              //found!!
+              return [ketteAList.getRange(0, i0 + 1).join(","), ketteBList.getRange(0, i0 + 1).join(",")];
+            }
+          }
+        }
+        if(ketteBList.length >= ketteAList.length){
+          for (var i1 = 0; i1 < ketteAList.length; i1++) {
+            if(ketteAList[i1] == ketteBList[i1]) {
+              //found!!
+              return [ketteAList.getRange(0, i1 + 1).join(","), ketteBList.getRange(0, i1 + 1).join(",")];
+            }
+          }
+        }
+      }
+    }
+    return [];
+  }
